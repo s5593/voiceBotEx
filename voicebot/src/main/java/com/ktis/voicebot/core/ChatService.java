@@ -3,6 +3,8 @@ package com.ktis.voicebot.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ktis.voicebot.api.dto.ChatRequest;
@@ -17,6 +19,8 @@ import com.ktis.voicebot.core.session.SessionStore;
 
 @Service
 public class ChatService {
+	
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
 
     private final SessionStore sessionStore;
     private final NluClient nluClient;
@@ -28,10 +32,19 @@ public class ChatService {
         this.nluClient = nluClient;
         this.dialogManager = dialogManager;
         this.turnLogService = turnLogService;
+
+        // 핵심: 스프링이 실제로 어떤 NluClient 구현체를 주입했는지 부팅 시점에 확인
+        log.info("[BOOT] NluClient injected = {}", nluClient.getClass().getName());
     }
 
     public ChatResponse handle(ChatRequest req) {
+    	log.info("[REQ] sessionId='{}', text='{}'", 
+    		    (req == null ? null : req.getSessionId()), 
+    		    (req == null ? null : req.getText()));
         long start = System.currentTimeMillis();
+
+        // 선택: 실제 요청이 들어올 때도 한 번 더 확인 가능 (너무 시끄러우면 지워도 됨)
+        log.debug("[CHAT] using NluClient = {}", nluClient.getClass().getName());
 
         SessionData session = sessionStore.getOrCreate(req.getSessionId());
         String stateBefore = session.getState().name();
@@ -44,14 +57,14 @@ public class ChatService {
 
         long latencyMs = System.currentTimeMillis() - start;
         turnLogService.logTurn(
-		  req.getSessionId(),
-		  req.getText(),
-		  outcome.getIntent().name(),
-		  stateBefore,
-		  session.getState().name(),
-		  latencyMs,
-		  outcome.getReplyText()
-		);
+            req.getSessionId(),
+            req.getText(),
+            outcome.getIntent().name(),
+            stateBefore,
+            session.getState().name(),
+            latencyMs,
+            outcome.getReplyText()
+        );
 
         ChatResponse res = new ChatResponse();
         res.setSessionId(req.getSessionId());
@@ -59,7 +72,7 @@ public class ChatService {
         res.setState(session.getState());
         res.setSlots(session.getSlots());
 
-        Map<String, Object> debug = new HashMap<>();
+        Map<String, Object> debug = new HashMap<String, Object>();
         debug.put("intent", outcome.getIntent().name());
         debug.put("confidence", nlu.getConfidence());
         res.setDebug(debug);

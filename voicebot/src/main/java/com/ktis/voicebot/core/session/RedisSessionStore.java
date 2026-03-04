@@ -34,11 +34,15 @@ public class RedisSessionStore implements SessionStore {
 
     @Override
     public SessionData getOrCreate(String sessionId) {
+    	System.out.println("[SESSION] getOrCreate sessionId=" + sessionId);
+    	
         return get(sessionId).orElseGet(() -> new SessionData(sessionId));
     }
 
     @Override
     public void save(SessionData session) {
+    	System.out.println("[SESSION] save sessionId=" + session.getSessionId() + ", state=" + session.getState());
+    	
         session.setUpdatedAtEpochMs(System.currentTimeMillis());
         redis.opsForValue().set(key(session.getSessionId()), session, ttl);
     }

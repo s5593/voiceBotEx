@@ -31,10 +31,12 @@ public class ChatController {
         this.nluClient = nluClient;
         this.dialogManager = dialogManager;
         this.turnLogService = turnLogService;
+        
+        System.out.println("[BOOT] SessionStore injected = " + sessionStore.getClass().getName());
     }
 
     @PostMapping("/chat")
-    public ChatResponse handle(ChatRequest req) {
+    public ChatResponse handle(@Valid @RequestBody ChatRequest req) {
         long start = System.currentTimeMillis();
 
         SessionData session = sessionStore.getOrCreate(req.getSessionId());
@@ -64,7 +66,7 @@ public class ChatController {
         res.setState(session.getState());
         res.setSlots(session.getSlots());
 
-        Map<String, Object> debug = new HashMap<>();
+        Map<String, Object> debug = new HashMap<String, Object>();
         debug.put("intent", outcome.getIntent().name());
         debug.put("confidence", nlu.getConfidence());
         res.setDebug(debug);
