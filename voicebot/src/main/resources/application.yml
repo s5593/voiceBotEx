@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+bot:
+  normalizer:
+    enable-replace-map: true
+    replace-map:
+      "한번": "1번"
+      "두번": "2번"
+      "세번": "3번"
+      "네번": "4번"
+      "다섯번": "5번"
+
+  nlu:
+    netflix-keywords:
+      - 넷플릭스
+
+    play-keywords:
+      - 틀어
+      - 재생
+      - 보여
+      - 켜
+
+    previous-keywords:
+      - 이전
+      - 이전꺼
+      - 전꺼
+
+    next-keywords:
+      - 다음
+      - 다음꺼
+
+    other-keywords:
+      - 다른
+      - 다른거
+
+  dialog:
+    messages:
+      "stt_retry": "잘 못 들었어요. 다시 말씀해 주세요."
+      "unknown": "요청을 이해하지 못했어요. 다시 말씀해 주세요."
+
+      "open_netflix": "넷플릭스를 실행할게요."
+
+      "list_missing": "현재 화면 목록 정보가 없어요. 목록이 보이는 화면에서 다시 말씀해 주세요."
+      "focus_missing": "현재 선택된 항목이 없어요. 몇 번을 틀지 말씀해 주세요. 예: 2번 틀어줘"
+
+      "index_ask": "몇 번을 틀지 다시 말씀해 주세요. 예: 2번 틀어줘"
+      "index_outOfRange": "해당 번호가 목록에 없어요. 1번부터 {max}번 중에서 말씀해 주세요."
+
+      "play_byIndex": "{index}번 '{title}' 재생할게요."
+      "other_noList": "다른 콘텐츠를 찾을까요? 제목을 말해 주세요."
